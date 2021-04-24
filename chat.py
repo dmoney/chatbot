@@ -2,6 +2,8 @@ from time import sleep
 from collections import namedtuple
 
 fact = namedtuple('fact', ['subject', 'verb', 'object'])
+
+#modifier
 mod = namedtuple('mod', ['subject', 'preposition', 'object'])
 
 """
@@ -15,17 +17,17 @@ e.g., "The quick brown fox jumped over the lazy dog."
 
 
 _ = fact(
-        mod('fox', None, ['the', 'quick', 'brown']), 
-        mod('jumped', 'over', mod('dog', None, ['the', 'lazy'])), 
+        mod('fox', None, ['the', 'quick', 'brown']),
+        mod('jumped', 'over', mod('dog', None, ['the', 'lazy'])),
         None)
-        
+
 Existing parser may not be capable of this level of parsing.
 
 
 knowledge is represented as a dictionary. A key is either a
 string or a modifier.  A value is a set of facts about that
 subject.
-        
+
 knowledge = {}
 knowledge['dogs'] = set()
 knowledge['dogs'].add(fact(...))
@@ -34,6 +36,8 @@ knowledge['dogs'].add(fact(...))
 PUNCTUATION = ('!', '?', '.', ',')
 
 def tokenize_word(text):
+    """Break a word ending in punctuation into separate
+    tokens for the word and the punctuation."""
     if len(text) <= 1:
         return [text]
     elif text[-1] in PUNCTUATION:
@@ -42,11 +46,14 @@ def tokenize_word(text):
         return [text]
 
 def tokenize(text):
+    """Break text into tokens (words or punctuation)."""
     for word in text.split():
         for token in tokenize_word(word):
             yield token
-            
+
 def sentencify(tokens):
+    """Separate the stream of tokens into sentences.
+    Breaks an iterable of tokens into an iterable of lists of tokens."""
     sentence = []
     for token in tokens:
         sentence.append(token)
@@ -54,7 +61,7 @@ def sentencify(tokens):
             yield sentence
             sentence = []
     if sentence:
-        yield sentence 
+        yield sentence
 
 # words at start of sentence indicating a question
 question_words = ['is', 'does', 'what', 'am', 'are']
@@ -62,11 +69,11 @@ question_words = ['is', 'does', 'what', 'am', 'are']
 def greeting():
     print("Hello!")
     _ = input(">> ")
-    
+
 def parting():
     sleep(2)
     print("Okay bye")
-    
+
 def catch_up():
     print("How are you?")
 
@@ -74,8 +81,8 @@ def catch_up():
     if answer == "good":
         print("Glad to hear it!")
         print("I'm doing well too.")
-    
-    
+
+
 def conversation():
     talking = True
     responses = [
@@ -86,7 +93,7 @@ def conversation():
         "So what you're saying is, it's complicated?",
     ]
     r = 0  # current response number
-    
+
     print("What's on your mind?")
     while talking:
         answer = input(">> ")
@@ -96,7 +103,7 @@ def conversation():
             print(responses[r])
             r += 1
             r = r % len(responses)
-            
+
 def good_conversation():
     knowledge = {}
     talking = True
@@ -149,11 +156,11 @@ def good_conversation():
                         knowledge_set.add(new_fact)
                 else:
                     print("Hm, that's interesting.")
-                        
-                        
-                
-            
-    
+
+
+
+
+
 if __name__ == "__main__":
 
     greeting()
@@ -161,6 +168,3 @@ if __name__ == "__main__":
     #conversation()
     good_conversation()
     parting()
-
-
-    
