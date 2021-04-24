@@ -1,0 +1,42 @@
+current subject
+list of subjects
+get subject from user's text
+distinguish types of message
+	statement
+	question
+		ends in ?
+		starts with question word ('is', 'does')
+	command
+		starts with 'you' or implicit subject, or addressed
+		addressed: Bot, do this
+	exclamation
+
+respond to user's statements
+	positive/negative opinion?
+	quoting user's text
+	
+facts
+	storing facts
+	parsing out of user's text
+		user says "x is y"
+		user asks "is x y?" -> yes, no, i don't know
+	state them?
+	ask about them?
+		"is x y?"
+	
+anatomy of a fact
+	subject
+	verb
+	object
+	modifier (adjective, adverb, subordinate clause)
+	
+subordinate clause
+	preposition
+	fact
+	
+parse user's message
+	break into tokens
+	break into sentences
+		break into words
+		normalize words (lowercase)
+	

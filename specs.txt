@@ -1,0 +1,9 @@
+Editor: Notepad++
+(could use another one 
+	like Atom, VS Code, or just
+	Notepad)
+	
+command line: Cygwin
+(could use cmd, Terminal, etc.)
+
+Programming Language: Python 3.4+
