@@ -34,6 +34,7 @@ knowledge['dogs'].add(fact(...))
 """
 
 PUNCTUATION = ('!', '?', '.', ',')
+ARTICLES = ('the', )  # TODO: add more articles
 
 def tokenize_word(text):
     """Break a word ending in punctuation into separate
@@ -104,6 +105,31 @@ def conversation():
             r += 1
             r = r % len(responses)
 
+def is_question(sentence):
+    if sentence[-1] == '?':
+        return True
+    elif sentence[0] in ('is', 'are', 'have', 'had', 'did', 'does', 'am'):
+        return True
+    else:
+        return False
+
+def is_statement(sentence):
+    return 'is' in sentence and not is_question(sentence)
+
+def strip_punctuation(sentence):
+    return [word for word in sentence if word not in PUNCTUATION]
+
+def split_sentence(sentence, token):
+    for i, word in enumerate(sentence):
+        if word == token:
+            return (sentence[:i], sentence[i+1:])
+    raise Exception(f"Token '{token}' is not in sentence.")
+
+def untokenize(tokens):
+    if isinstance(tokens, str):
+        return tokens
+    return ' '.join(tokens)
+
 def good_conversation():
     knowledge = {}
     talking = True
@@ -116,49 +142,54 @@ def good_conversation():
             answer = answer.lower()
             sentences = list(sentencify(tokenize(answer)))
             for sentence in sentences:
+                stripped_sentence = strip_punctuation(sentence)
                 if not sentence:
                     continue
-                if sentence[0] == 'is':  # it's a question
-                    if len(sentence) < 3:
-                        # TODO, cut off punctuation
-                        print("Sorry, I don't understand.")
+                if len(stripped_sentence) < 3:
+                    print("Sorry, what?")
+                elif is_question(sentence):  # it's a question
+                    try:
+                        before, after = split_sentence(stripped_sentence, 'is')
+                    except:
+                        print('Sorry, what are you asking?')
                         continue
-                    else:
+                    if not before:  # part before 'is' is empty
                         verb = 'is'
-                        subject = sentence[1]
-                        object = tuple(sentence[2:])
-                        result = knowledge.get(subject, None)
-                        if result is None:
-                            print("I don't know anything about " + subject + '.')
-                            continue
-                        if fact(subject, verb, object) in result:
-                            print("Yes.")
-                        else:
-                            print("No.")
-                elif sentence[1] == 'is':
-                    if len(sentence) < 3:
-                        # TODO, cut off punctuation
-                        print("Sorry, I don't understand.")
+                        subject = after[0]
+                        object = tuple(after[2:])
+                    else:
+                        subject = tuple(before)
+                        object = tuple(after)
+
+                    result = knowledge.get(subject, None)
+                    if result is None:
+                        print("I don't know anything about " + untokenize(subject) + '.')
                         continue
+                    if fact(subject, verb, object) in result:
+                        print("Yes.")
                     else:
-                        subject = sentence[0]
-                        verb = 'is'
-                        object = tuple(sentence[2:])
-                        new_fact = fact(subject, verb, object)
-                        knowledge_set = knowledge.get(subject, None)
-                        if knowledge_set is None:
-                            knowledge_set = set()
-                            knowledge[subject] = knowledge_set
-                        if new_fact not in knowledge_set:
-                            print("Huh, I didn't know that.")
-                        else:
-                            print("I know.")
-                        knowledge_set.add(new_fact)
+                        print("I don't know.")
+                elif is_statement(sentence):
+                    try:
+                        before, after = split_sentence(stripped_sentence, 'is')
+                    except:
+                        print('Sorry, what are you asking?')
+                        continue
+                    subject = tuple(before)
+                    verb = 'is'
+                    object = tuple(after)
+                    new_fact = fact(subject, verb, object)
+                    knowledge_set = knowledge.get(subject, None)
+                    if knowledge_set is None:
+                        knowledge_set = set()
+                        knowledge[subject] = knowledge_set
+                    if new_fact not in knowledge_set:
+                        print("Huh, I didn't know that.")
+                    else:
+                        print("I know.")
+                    knowledge_set.add(new_fact)
                 else:
                     print("Hm, that's interesting.")
-
-
-
 
 
 if __name__ == "__main__":
